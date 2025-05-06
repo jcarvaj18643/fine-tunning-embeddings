@@ -10,3 +10,4 @@ sentence-transformers
 optimum
 onnx
 onnxruntime
+accelerate
