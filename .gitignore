@@ -3,5 +3,7 @@ taller
 /model
 model
 
+/fine_tuned_model_oil_gas
+fine_tuned_model_oil_gas
 
 .env
