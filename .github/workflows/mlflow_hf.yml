@@ -24,10 +24,11 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements_linux.txt
+          pip install --upgrade huggingface_hub
 
       - name: Hugging Face login
         run: |
-          echo "${HF_TOKEN}" | huggingface-cli login --stdin
+          huggingface-cli login --token "$HF_TOKEN"
 
       - name: Remove previous model repo (if exists)
         run: |
