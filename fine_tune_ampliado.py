@@ -21,7 +21,7 @@ def get_config():
         "model_name": "all-MiniLM-L6-v2",
         "train_dataset_path": "training_data_quality.jsonl",
         "output_path": "fine_tuned_model_oil_gas",
-        "num_train_epochs": 1,
+        "num_train_epochs": 15,
         "batch_size": 32
     }
 
