@@ -23,11 +23,11 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r home/ubuntu/requirements_linux.txt
+          pip install -r requirements_linux.txt
 
       - name: Train and export models
         run: |
-          python home/ubuntu/fine_tune_ampliado.py
+          python fine_tune_ampliado.py
 
       - name: Remove previous model repo (if exists)
         run: |
@@ -36,20 +36,20 @@ jobs:
       - name: Upload fine-tuned model to Hugging Face Model Hub
         run: |
           huggingface-cli repo create jacgandres/fine-tunning-embeddings --type=model --token $HF_TOKEN --yes || true
-          huggingface-cli upload --repo-type model --token $HF_TOKEN --repo-id jacgandres/fine-tunning-embeddings home/ubuntu/fine_tuned_model_oil_gas/*
+          huggingface-cli upload --repo-type model --token $HF_TOKEN --repo-id jacgandres/fine-tunning-embeddings fine_tuned_model_oil_gas/*
 
       - name: Upload ONNX quantized model to Hugging Face Model Hub
         run: |
-          huggingface-cli upload --repo-type model --token $HF_TOKEN --repo-id jacgandres/fine-tunning-embeddings home/ubuntu/fine_tuned_model_oil_gas/onnx/*
+          huggingface-cli upload --repo-type model --token $HF_TOKEN --repo-id jacgandres/fine-tunning-embeddings fine_tuned_model_oil_gas/onnx/*
 
       - name: Upload final model folders (model/tuned-oil-gas-*)
         run: |
-          for d in home/ubuntu/model/tuned-oil-gas-*; do
+          for d in model/tuned-oil-gas-*; do
             if [ -d "$d" ]; then
               huggingface-cli upload --repo-type model --token $HF_TOKEN --repo-id jacgandres/fine-tunning-embeddings "$d"/*
             fi
           done
-          for d in home/ubuntu/model/onnx-oil-gas-int8-*; do
+          for d in model/onnx-oil-gas-int8-*; do
             if [ -d "$d" ]; then
               huggingface-cli upload --repo-type model --token $HF_TOKEN --repo-id jacgandres/fine-tunning-embeddings "$d"/*
             fi
