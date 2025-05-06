@@ -1,0 +1,56 @@
+name: Train and Deploy to Hugging Face
+
+on:
+  push:
+    branches:
+      - features/ml-flow
+
+jobs:
+  train-and-deploy:
+    runs-on: ubuntu-latest
+    env:
+      HF_HOME: ${{ github.workspace }}/.cache/huggingface
+      HF_TOKEN: ${{ secrets.HF }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r home/ubuntu/requirements_linux.txt
+
+      - name: Train and export models
+        run: |
+          python home/ubuntu/fine_tune_ampliado.py
+
+      - name: Remove previous model repo (if exists)
+        run: |
+          huggingface-cli delete-repo --yes --token $HF_TOKEN jacgandres/fine-tunning-embeddings || true
+
+      - name: Upload fine-tuned model to Hugging Face Model Hub
+        run: |
+          huggingface-cli repo create jacgandres/fine-tunning-embeddings --type=model --token $HF_TOKEN --yes || true
+          huggingface-cli upload --repo-type model --token $HF_TOKEN --repo-id jacgandres/fine-tunning-embeddings home/ubuntu/fine_tuned_model_oil_gas/*
+
+      - name: Upload ONNX quantized model to Hugging Face Model Hub
+        run: |
+          huggingface-cli upload --repo-type model --token $HF_TOKEN --repo-id jacgandres/fine-tunning-embeddings home/ubuntu/fine_tuned_model_oil_gas/onnx/*
+
+      - name: Upload final model folders (model/tuned-oil-gas-*)
+        run: |
+          for d in home/ubuntu/model/tuned-oil-gas-*; do
+            if [ -d "$d" ]; then
+              huggingface-cli upload --repo-type model --token $HF_TOKEN --repo-id jacgandres/fine-tunning-embeddings "$d"/*
+            fi
+          done
+          for d in home/ubuntu/model/onnx-oil-gas-int8-*; do
+            if [ -d "$d" ]; then
+              huggingface-cli upload --repo-type model --token $HF_TOKEN --repo-id jacgandres/fine-tunning-embeddings "$d"/*
+            fi
+          done

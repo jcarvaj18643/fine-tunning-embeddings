@@ -1,0 +1,11 @@
+torch
+torchvision
+torchaudio
+transformers
+datasets
+pandas
+scikit-learn
+mlflow
+sentence-transformers
+optimum
+onnxruntime
